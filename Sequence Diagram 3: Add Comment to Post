@@ -1,0 +1,24 @@
+@startuml
+title Use Case 6: Add Comment to Post
+
+actor User
+participant WebInterface
+participant CommentControl
+database Database
+
+User -> WebInterface: clickAddComment()
+activate WebInterface
+WebInterface --> User: displayCommentBox()
+User -> WebInterface: submitComment(postID, text)
+WebInterface -> CommentControl: createComment(postID, userID, text)
+activate CommentControl
+CommentControl -> Database: insertComment(postID, userID, text, timestamp)
+activate Database
+Database --> CommentControl: confirmCommentID
+deactivate Database
+CommentControl --> WebInterface: returnSuccess(commentID)
+deactivate CommentControl
+WebInterface --> User: displayNewComment()
+deactivate WebInterface
+
+@enduml
