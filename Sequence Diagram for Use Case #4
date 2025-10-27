@@ -1,0 +1,24 @@
+@startuml
+title Use Case 4: Create Community Post
+
+actor User
+participant WebInterface
+participant PostControl
+database Database
+
+User -> WebInterface: clickCreatePost()
+activate WebInterface
+WebInterface --> User: displayPostForm()
+User -> WebInterface: submitPost(content, tags)
+WebInterface -> PostControl: createPost(content, tags, userID)
+activate PostControl
+PostControl -> Database: insertPost(content, tags, userID, timestamp)
+activate Database
+Database --> PostControl: confirmPostID
+deactivate Database
+PostControl --> WebInterface: returnSuccess(postID)
+deactivate PostControl
+WebInterface --> User: displayConfirmation()
+deactivate WebInterface
+
+@enduml
