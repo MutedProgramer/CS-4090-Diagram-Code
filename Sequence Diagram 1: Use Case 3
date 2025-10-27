@@ -1,0 +1,22 @@
+@startuml
+title Use Case 3: View Music Community Board
+
+actor User
+participant WebInterface
+participant PostController
+database Database
+
+User -> WebInterface: requestCommunityBoard()
+activate WebInterface
+WebInterface -> PostController: getRecentPosts()
+activate PostController
+PostController -> Database: fetchPosts(order=recent)
+activate Database
+Database --> PostController: postList
+deactivate Database
+PostController --> WebInterface: formattedPosts
+deactivate PostController
+WebInterface --> User: displayPosts(postList)
+deactivate WebInterface
+
+@enduml
