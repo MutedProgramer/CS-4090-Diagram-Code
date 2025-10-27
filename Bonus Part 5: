@@ -1,0 +1,101 @@
+@startuml
+title Combining 10 highest priority use cases
+
+actor User
+participant WebInterface
+participant PostControl
+participant CommentControl
+participant MediaService
+participant TutorialControl
+database Database
+
+== Use Case 1, 8, 9: Tutorials Section (also includes filtering by tags/difficulty) ==
+User -> WebInterface: requestTutorialsSection(difficultyLevel, tags)
+activate WebInterface
+WebInterface -> TutorialControl: getTutorials(difficultyLevel, tags)
+activate TutorialControl
+TutorialControl -> Database: fetchTutorials(difficultyLevel, tags)
+activate Database
+Database --> TutorialControl: filteredTutorialsList
+deactivate Database
+TutorialControl --> WebInterface: formattedTutorialsList
+deactivate TutorialControl
+WebInterface --> User: displayTutorials(filteredTutorialsList)
+deactivate WebInterface
+
+== Use Case 2: Song Style Tutorial ==
+User -> WebInterface: requestStyleTutorial(currentTutorial)
+activate WebInterface
+WebInterface -> TutorialControl: getStyleTutorial(currentTutorial)
+activate TutorialControl
+TutorialControl -> Database: fetchStyleTutorial(currentTutorial)
+activate Database
+Database --> TutorialControl: styleTutorial
+deactivate Database
+TutorialControl --> WebInterface: styleTutorialObj
+deactivate TutorialControl
+WebInterface --> User: displayStyleTutorial(styleTutorialObj)
+deactivate WebInterface
+
+== Use Case 3: View Music Community Board ==
+
+User -> WebInterface: requestCommunityBoard()
+activate WebInterface
+WebInterface -> PostControl: getRecentPosts()
+activate PostControl
+PostControl -> Database: fetchPosts(order=recent)
+activate Database
+Database --> PostControl: postList
+deactivate Database
+PostControl --> WebInterface: formattedPosts
+deactivate PostControl
+WebInterface --> User: displayPosts(postList)
+deactivate WebInterface
+
+== Use Case 4: Create Community Post ==
+
+User -> WebInterface: clickCreatePost()
+activate WebInterface
+WebInterface --> User: displayPostForm()
+User -> WebInterface: submitPost(content, tags)
+WebInterface -> PostControl: createPost(content, tags, userID)
+activate PostControl
+PostControl -> Database: insertPost(content, tags, userID, timestamp)
+activate Database
+Database --> PostControl: confirmPostID
+deactivate Database
+PostControl --> WebInterface: returnSuccess(postID)
+deactivate PostControl
+WebInterface --> User: displayConfirmation()
+deactivate WebInterface
+
+== Use Case 5: Community Post with Media ==
+
+User -> WebInterface: clickCreatePost()
+activate WebInterface
+WebInterface --> User: displayPostForm()
+
+User -> WebInterface: uploadMedia(file)
+WebInterface -> MediaService: storeMedia(file)
+activate MediaService
+MediaService --> WebInterface: return mediaURL
+deactivate MediaService
+
+User -> WebInterface: submitPost(content, mediaURL)
+WebInterface -> PostControl: createPost(content, mediaURL, userID)
+activate PostControl
+PostControl -> Database: insertPost(content, mediaURL, userID)
+activate Database
+Database --> PostControl: confirmPostID
+deactivate Database
+PostControl --> WebInterface: returnSuccess(postID)
+deactivate PostControl
+WebInterface --> User: displayPostWithMedia()
+deactivate WebInterface
+
+note over WebInterface, MediaService
+Media upload is asynchronous; user can edit post
+while upload completes. This may be subject to change
+end note
+
+... (78 lines left)
