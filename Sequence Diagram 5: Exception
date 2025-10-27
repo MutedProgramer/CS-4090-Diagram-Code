@@ -1,0 +1,26 @@
+@startuml
+title Exception Flow: Comment Submission Fails
+
+actor User
+participant WebInterface
+participant CommentControl
+database Database
+
+User -> WebInterface: submitComment(postID, text)
+activate WebInterface
+WebInterface -> CommentControl: createComment(postID, userID, text)
+activate CommentControl
+CommentControl -> Database: insertComment(...)
+activate Database
+Database --> CommentControl: error(DatabaseConnectionError)
+deactivate Database
+CommentControl --> WebInterface: returnError("Comment submission failed")
+deactivate CommentControl
+WebInterface --> User: displayErrorMessage("Unable to post comment. Please try again.")
+deactivate WebInterface
+
+note over Database, CommentControl
+System detects failure and returns immediately.
+end note
+
+@enduml
