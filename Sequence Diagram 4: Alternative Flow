@@ -1,0 +1,37 @@
+@startuml
+title Alternative Flow Diagram: Create Post with Media Upload
+
+actor User
+participant WebInterface
+participant PostControl
+participant MediaService
+database Database
+
+User -> WebInterface: clickCreatePost()
+activate WebInterface
+WebInterface --> User: displayPostForm()
+
+User -> WebInterface: uploadMedia(file)
+WebInterface -> MediaService: storeMedia(file)
+activate MediaService
+MediaService --> WebInterface: return mediaURL
+deactivate MediaService
+
+User -> WebInterface: submitPost(content, mediaURL)
+WebInterface -> PostControl: createPost(content, mediaURL, userID)
+activate PostControl
+PostControl -> Database: insertPost(content, mediaURL, userID)
+activate Database
+Database --> PostControl: confirmPostID
+deactivate Database
+PostControl --> WebInterface: returnSuccess(postID)
+deactivate PostControl
+WebInterface --> User: displayPostWithMedia()
+deactivate WebInterface
+
+note over WebInterface, MediaService
+Media upload is asynchronous; user can edit post
+while upload completes. This may be subject to change
+end note
+
+@enduml
