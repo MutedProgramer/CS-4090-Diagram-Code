@@ -98,4 +98,81 @@ Media upload is asynchronous; user can edit post
 while upload completes. This may be subject to change
 end note
 
-... (78 lines left)
+== Use Case 15: Filtering Posts ==
+User -> WebInterface: clickFilters()
+activate WebInterface
+WebInterface --> User: displayFilterOptions()
+User -> WebInterface: requestFilteredPosts(filters)
+WebInterface -> PostControl: filterPosts(filters)
+activate PostControl
+PostControl -> Database: fetchFilteredPosts(filters)
+activate Database
+Database --> PostControl: filteredPostsList
+deactivate Database
+PostControl --> WebInterface: filteredPostsList
+deactivate PostControl
+WebInterface --> User: displayPosts(filteredPostList)
+deactivate WebInterface
+
+== Use Case 17: Post Search ==
+User -> WebInterface: clickSearchPosts()
+activate WebInterface
+WebInterface --> User: displaySearchInput()
+User -> WebInterface: sendSearchQuery(query)
+WebInterface -> PostControl: requestPostsContainingQuery(query)
+activate PostControl
+PostControl -> Database: fetchPostsContainingQuery(query)
+activate Database
+Database --> PostControl: queryPostList
+deactivate Database
+PostControl --> WebInterface: queryPostList
+deactivate PostControl
+WebInterface --> User: displayPosts(queryPostList)
+deactivate WebInterface
+
+== Use Case 6: Add Comment to Post ==
+
+User -> WebInterface: clickAddComment()
+activate WebInterface
+WebInterface --> User: displayCommentBox()
+User -> WebInterface: submitComment(postID, text)
+WebInterface -> CommentControl: createComment(postID, userID, text)
+activate CommentControl
+CommentControl -> Database: insertComment(postID, userID, text, timestamp)
+activate Database
+Database --> CommentControl: confirmCommentID
+deactivate Database
+CommentControl --> WebInterface: returnSuccess(commentID)
+deactivate CommentControl
+WebInterface --> User: displayNewComment()
+deactivate WebInterface
+
+== Use Case 7.0: Like Post ==
+User -> WebInterface: reactToPost(postID, likeOrDislike)
+activate WebInterface
+WebInterface -> PostControl: requestUpdateReactCounter(postID, likeOrDislike)
+activate PostControl
+PostControl -> Database: updatePostReactions(postID, likeOrDislike)
+activate Database
+Database --> PostControl: confirmPostID
+deactivate Database
+PostControl --> WebInterface: returnSuccess(confirmPostID)
+deactivate PostControl
+WebInterface --> User: updateDisplayedPostReactions()
+deactivate WebInterface
+
+== Use Case 7.1: Like Comment ==
+User -> WebInterface: reactToComment(commentID, likeOrDislike)
+activate WebInterface
+WebInterface -> CommentControl: requestUpdateReactCounter(commentID, likeOrDislike)
+activate CommentControl
+CommentControl -> Database: updatePostReactions(post, likeOrDislike)
+activate Database
+Database --> CommentControl: confirmCommentID
+deactivate Database
+CommentControl --> WebInterface: returnSuccess(confirmCommentID)
+deactivate CommentControl
+WebInterface --> User: updateDisplayedCommentReactions()
+deactivate WebInterface
+
+@enduml
